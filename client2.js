@@ -4,8 +4,8 @@ const clientId = '10:06:1C:83:E7:B0'
 const companyId = 'empresa2'
 
 const options = {
-  host: '52.15.167.220',
-  port: 1883,
+  host: process.env.MQTT_HOST,
+  port: process.env.MQTT_PORT,
   keepalive: 60, 
   clientId: clientId, 
   will: {

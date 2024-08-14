@@ -1,8 +1,8 @@
 const mqtt = require("mqtt");
 
 const options = {
-  host: "52.15.167.220",
-  port: 1883,
+  host: process.env.MQTT_HOST,
+  port: process.env.MQTT_PORT,
   clientId: 'serverMQTTjs', 
   // username: "harold",
   // password: "Harold151199",

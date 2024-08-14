@@ -1,11 +1,11 @@
 const mqtt = require('mqtt');
 
-const clientId = '10:06:1C:83:E7:B2'
-const companyId = 'empresa1'
+const clientId = '10:06:1C:83:E7:B1'
+const companyId = 'empresa3'
 
 const options = {
-  host: '52.15.167.220',
-  port: 1883,
+  host: process.env.MQTT_HOST,
+  port: process.env.MQTT_PORT,
   keepalive: 60, 
   clientId: clientId, 
   will: {
@@ -21,9 +21,14 @@ const options = {
 
 const client = mqtt.connect(options);
 
+const configTopic = `${companyId}/sensors/${clientId}/config`;
+const updateTopic = `${companyId}/sensors/${clientId}/updated`;
+
+let currentConfig = {};
+
 client.on('connect', function () {
   console.log('Connected to FlashMQ');
-  client.subscribe(`${companyId}/sensors/${clientId}/config`);
+  client.subscribe(configTopic);
   setInterval(() => {
     const data = {
       temperature: 5.5,
@@ -36,16 +41,23 @@ client.on('connect', function () {
       JSON.stringify(data),
       { qos: 1, retain: false }
     );
-    console.log('publish ');
+    console.log('publish');
   }, 20000); 
 });
 
 client.on('message', function (topic, message) {
   const msg = JSON.parse(message.toString());
   console.log(`Topic: ${topic}, Message: ${msg}`);
-  if (topic === `${companyId}/sensors/${clientId}/config`) {
-    const config = msg;
-    // Implementa la lógica para aplicar la nueva configuración
+  if (topic === configTopic) {
+    currentConfig = JSON.parse(message.toString());
+    console.log('Configuración recibida y aplicada:', currentConfig);
+    client.publish(updateTopic, JSON.stringify(currentConfig), { qos: 1 }, (err) => {
+      if (err) {
+          console.error('Error publicando confirmación:', err);
+      } else {
+          console.log('Confirmación de actualización publicada en:', updateTopic);
+      }
+  });
   }
 });
 

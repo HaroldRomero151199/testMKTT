@@ -7,7 +7,18 @@ const measurementSchema = new mongoose.Schema({
   voltage: Number,
 }, { _id: false });
 
+const configSchema = new mongoose.Schema({
+  criticalMax: Number,
+  criticalMin: Number,
+  measIntervalSec: Number,
+  normalMax: Number,
+  normalMin: Number,
+  wifiPass: String,
+  wifiSSID: String,
+}, { _id: false });
+
 const sensorSchema = new mongoose.Schema({
+  config: configSchema,
   measurements: {
     type: Map,
     of: measurementSchema
@@ -15,6 +26,7 @@ const sensorSchema = new mongoose.Schema({
 });
 
 module.exports = {
-  measurementSchema,
-  sensorSchema
+  sensorSchema,
+  configSchema,
+  measurementSchema
 };
